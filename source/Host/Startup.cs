@@ -30,6 +30,7 @@ using IdentityManager.Host;
 using System.Threading.Tasks;
 using System.IdentityModel.Tokens;
 using Microsoft.Owin.Security.Cookies;
+using IdentityServer3.AccessTokenValidation;
 
 //[assembly: OwinStartup(typeof(StartupWithLocalhostSecurity))]
 [assembly: OwinStartup(typeof(StartupWithHostCookiesSecurity))]
@@ -124,13 +125,30 @@ namespace IdentityManager.Host
                 factory.Register(new Registration<ICollection<InMemoryRole>>(roles));
                 factory.IdentityManagerService = new Registration<IIdentityManagerService, InMemoryIdentityManagerService>();
 
+                idm.Use(async (context, next) =>
+                {
+                    await next.Invoke();
+                });
+
+                idm.UseIdentityServerBearerTokenAuthentication(new IdentityServerBearerTokenAuthenticationOptions
+                {
+                    Authority = "https://localhost:44337/ids",
+                    ValidationMode = ValidationMode.ValidationEndpoint,
+                    RequiredScopes = new[] { "idmgr" }
+                });
+
+                idm.Use(async (context, next) =>
+                {
+                    await next.Invoke();
+                });
+
                 idm.UseIdentityManager(new IdentityManagerOptions
                 {
+                    DisableUserInterface = true,
                     Factory = factory,
-                    SecurityConfiguration = new HostSecurityConfiguration
+                    SecurityConfiguration = new HostSecurityConfiguration()
                     {
-                        HostAuthenticationType = "Cookies",
-                        AdditionalSignOutType = "oidc"
+                        HostAuthenticationType = Constants.BearerAuthenticationType
                     }
                 });
             });

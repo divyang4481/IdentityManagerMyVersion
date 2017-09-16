@@ -23,6 +23,7 @@ using IdentityServer3.Core.Services;
 using IdentityServer3.Core.Services.Default;
 using IdentityServer3.Core.Services.InMemory;
 using Owin;
+using Serilog;
 
 namespace IdentityManager.Host.IdSvr
 {
@@ -45,6 +46,11 @@ namespace IdentityManager.Host.IdSvr
                 Factory = factory
             };
             app.UseIdentityServer(idsrvOptions);
+
+            Serilog.Log.Logger =
+                new LoggerConfiguration().MinimumLevel.Debug()
+                    .WriteTo.RollingFile(pathFormat: @"c:\logs\IdSvrAdmin-{Date}.log")
+                    .CreateLogger();
         }
 
         static List<InMemoryUser> GetUsers()
@@ -66,6 +72,7 @@ namespace IdentityManager.Host.IdSvr
                     Claims = new Claim[]{
                         new Claim(Constants.ClaimTypes.Name, "Alice"),
                         new Claim(Constants.ClaimTypes.Role, "Foo"),
+                        new Claim(Constants.ClaimTypes.Role, "IdentityManagerAdministrator")
                     }
                 }
             };
@@ -92,6 +99,28 @@ namespace IdentityManager.Host.IdSvr
                         IdentityManager.Constants.IdMgrScope
                     }
                 },
+                new Client
+                {
+                    ClientName = "POSTMAN Application",
+                    ClientId = "postman",
+                    ClientSecrets = new List<Secret> {
+                        new Secret("ClientSecret".Sha256())
+                    },
+                    Enabled = true,
+                    RequireConsent = false,
+                    Claims = new List<Claim>
+                    {
+                        new Claim(Constants.ClaimTypes.Name, "Identity Manager API"),
+                        new Claim(Constants.ClaimTypes.Role, IdentityManager.Constants.AdminRoleName)
+                    },
+                    Flow = Flows.ResourceOwner,
+                    PrefixClientClaims = false,
+                    AccessTokenType = AccessTokenType.Jwt,
+                    AllowedScopes = new List<string>()
+                    {
+                         IdentityManager.Constants.IdMgrScope
+                    }
+                },
             };
         }
 
@@ -103,10 +132,10 @@ namespace IdentityManager.Host.IdSvr
                     Name = IdentityManager.Constants.IdMgrScope,
                     DisplayName = "IdentityManager",
                     Description = "Authorization for IdentityManager",
-                    Type = ScopeType.Identity,
+                    Type = ScopeType.Resource,
                     Claims = new List<ScopeClaim>{
-                        new ScopeClaim(Constants.ClaimTypes.Name),
-                        new ScopeClaim(Constants.ClaimTypes.Role)
+                        new ScopeClaim(Constants.ClaimTypes.Name,true),
+                        new ScopeClaim(Constants.ClaimTypes.Role,true),
                     }
                 },
             };
