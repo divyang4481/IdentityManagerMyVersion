@@ -56,7 +56,7 @@
 
     function idmTokenManager(OidcTokenManager, oauthSettings, PathBase, $window, $rootScope) {
 
-        oauthSettings.response_type = "token";
+        //oauthSettings.response_type = "token";
 
         var mgr = new OidcTokenManager(oauthSettings);
 

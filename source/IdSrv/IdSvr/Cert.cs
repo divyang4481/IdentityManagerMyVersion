@@ -13,17 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
 
-namespace IdentityManager.Host.IdSvr
+namespace IdSrv.IdSvr
 {
     public class Cert
     {
         public static X509Certificate2 Load()
         {
             var assembly = typeof(Cert).Assembly;
-            using (var stream = assembly.GetManifestResourceStream("IdentityManager.Host.IdSvr.idsrv3test.pfx"))
+            using (var stream = assembly.GetManifestResourceStream("IdSrv.IdSvr.idsrv3test.pfx"))
             {
                 return new X509Certificate2(ReadStream(stream), "idsrv3test");
             }

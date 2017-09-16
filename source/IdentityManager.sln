@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Host", "Host\Host.csproj", "{D1A280BE-52ED-4B41-BE67-BC933BA5D2B1}"
 EndProject
@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{5714B8
 	ProjectSection(SolutionItems) = preProject
 		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdSrv", "IdSrv\IdSrv.csproj", "{730B0CCD-C05C-430C-97E4-833867066085}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,6 +28,10 @@ Global
 		{319E13DD-C16A-4936-B179-BBFBA52C693B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{319E13DD-C16A-4936-B179-BBFBA52C693B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{319E13DD-C16A-4936-B179-BBFBA52C693B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{730B0CCD-C05C-430C-97E4-833867066085}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{730B0CCD-C05C-430C-97E4-833867066085}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{730B0CCD-C05C-430C-97E4-833867066085}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{730B0CCD-C05C-430C-97E4-833867066085}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

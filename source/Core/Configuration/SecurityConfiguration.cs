@@ -32,6 +32,8 @@ namespace IdentityManager.Configuration
 
         public virtual bool? ShowLoginButton { get; set; }
 
+        public OAuthSettings OAuthSettings { get; set; }
+
         internal SecurityConfiguration()
         {
             RequireSsl = true;

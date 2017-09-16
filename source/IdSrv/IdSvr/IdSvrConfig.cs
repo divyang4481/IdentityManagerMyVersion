@@ -17,14 +17,16 @@
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
+using IdentityManager;
 using IdentityServer3.Core.Configuration;
 using IdentityServer3.Core.Models;
 using IdentityServer3.Core.Services;
 using IdentityServer3.Core.Services.Default;
 using IdentityServer3.Core.Services.InMemory;
 using Owin;
+using Serilog;
 
-namespace IdentityManager.Host.IdSvr
+namespace IdSrv.IdSvr
 {
     public class IdSvrConfig
     {
@@ -45,6 +47,11 @@ namespace IdentityManager.Host.IdSvr
                 Factory = factory
             };
             app.UseIdentityServer(idsrvOptions);
+
+            Serilog.Log.Logger =
+                new LoggerConfiguration().MinimumLevel.Debug()
+                    .WriteTo.RollingFile(pathFormat: @"c:\logs\IdSvrAdmin-{Date}.log")
+                    .CreateLogger();
         }
 
         static List<InMemoryUser> GetUsers()
@@ -82,6 +89,8 @@ namespace IdentityManager.Host.IdSvr
                     RequireConsent = false,
                     RedirectUris = new List<string>{
                         "https://localhost:44337",
+                        "https://localhost:44337/idm",
+                        "https://localhost:44337/idm/#/callback/",
                     },
                     PostLogoutRedirectUris = new List<string>{
                         "https://localhost:44337/idm"
@@ -89,7 +98,8 @@ namespace IdentityManager.Host.IdSvr
                     IdentityProviderRestrictions = new List<string>(){IdentityServer3.Core.Constants.PrimaryAuthenticationType},
                     AllowedScopes = {
                         IdentityServer3.Core.Constants.StandardScopes.OpenId,
-                        IdentityManager.Constants.IdMgrScope
+                        IdentityManager.Constants.IdMgrScope,
+                        "MyApi"
                     }
                 },
             };
@@ -104,6 +114,16 @@ namespace IdentityManager.Host.IdSvr
                     DisplayName = "IdentityManager",
                     Description = "Authorization for IdentityManager",
                     Type = ScopeType.Identity,
+                    Claims = new List<ScopeClaim>{
+                        new ScopeClaim(Constants.ClaimTypes.Name),
+                        new ScopeClaim(Constants.ClaimTypes.Role)
+                    }
+                },
+                new Scope{
+                    Name = "MyApi",
+                    DisplayName = "MyApi Display Name",
+                    Description = "Authorization for IdentityManager",
+                    Type = ScopeType.Resource,
                     Claims = new List<ScopeClaim>{
                         new ScopeClaim(Constants.ClaimTypes.Name),
                         new ScopeClaim(Constants.ClaimTypes.Role)

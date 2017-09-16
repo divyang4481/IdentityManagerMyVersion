@@ -15,21 +15,19 @@
  */
 
 using Owin;
-using System.Collections;
 using System.Collections.Generic;
 using System.Security.Claims;
 using IdentityManager.Configuration;
 using IdentityManager.Core.Logging;
 using IdentityManager.Extensions;
-using IdentityManager.Host.IdSvr;
 using IdentityManager.Host.InMemoryService;
 using IdentityManager.Logging;
-using Microsoft.Owin.Logging;
 using Microsoft.Owin;
 using IdentityManager.Host;
 using System.Threading.Tasks;
 using System.IdentityModel.Tokens;
-using Microsoft.Owin.Security.Cookies;
+using IdentityManager.Assets;
+using IdentityServer3.AccessTokenValidation;
 
 //[assembly: OwinStartup(typeof(StartupWithLocalhostSecurity))]
 [assembly: OwinStartup(typeof(StartupWithHostCookiesSecurity))]
@@ -70,16 +68,17 @@ namespace IdentityManager.Host
         {
             LogProvider.SetCurrentLogProvider(new TraceSourceLogProvider());
 
+            //This configuration is needed in case we are NOT using OAuthSettings() into the SecurityConfiguration
             JwtSecurityTokenHandler.InboundClaimTypeMap = new Dictionary<string, string>();
             app.UseCookieAuthentication(new Microsoft.Owin.Security.Cookies.CookieAuthenticationOptions
             {
                 AuthenticationType = "Cookies",
             });
-            
+
             app.UseOpenIdConnectAuthentication(new Microsoft.Owin.Security.OpenIdConnect.OpenIdConnectAuthenticationOptions
             {
                 AuthenticationType = "oidc",
-                Authority = "https://localhost:44337/ids",
+                Authority = "https://localhost:44338/ids",
                 ClientId = "idmgr_client",
                 RedirectUri = "https://localhost:44337",
                 ResponseType = "id_token",
@@ -123,23 +122,48 @@ namespace IdentityManager.Host
                 factory.Register(new Registration<ICollection<InMemoryUser>>(users));
                 factory.Register(new Registration<ICollection<InMemoryRole>>(roles));
                 factory.IdentityManagerService = new Registration<IIdentityManagerService, InMemoryIdentityManagerService>();
+                
+                JwtSecurityTokenHandler.InboundClaimTypeMap = new Dictionary<string, string>();
+                
+                string authority = "https://localhost:44338/ids";
+                string idmUrl = "https://localhost:44337/idm";
+                
+                idm.Use(async (context, next) =>
+                {
+                    await next.Invoke();
+                });
+
+                idm.UseIdentityServerBearerTokenAuthentication(new IdentityServerBearerTokenAuthenticationOptions
+                {
+                    Authority = authority,
+                    RequiredScopes = new[] { "idmgr" },
+                });
+
+                idm.Use(async (context, next) =>
+                {
+                    await next.Invoke();
+                });
 
                 idm.UseIdentityManager(new IdentityManagerOptions
                 {
                     Factory = factory,
-                    SecurityConfiguration = new HostSecurityConfiguration
+                    SecurityConfiguration = new EmptySecurityConfiguration
                     {
-                        HostAuthenticationType = "Cookies",
-                        AdditionalSignOutType = "oidc"
+                        OAuthSettings = new OAuthSettings()
+                        {
+                            authorization_endpoint = authority + "/connect/authorize",
+                            client_id = "idmgr_client",
+                            authority = authority,
+                            response_type = "id_token token",
+                            redirect_uri = idmUrl + "/#/callback/",
+                            //scope = "openid",
+                            scope = "openid idmgr MyApi",
+                            //response_mode = ""
+                            acr_values = "tenant:anything",
+                            load_user_profile = true
+                        }
                     }
                 });
-            });
-
-            // this configures an embedded IdentityServer to act as an external authentication provider
-            // when using IdentityManager in Token security mode. normally you'd configure this elsewhere.
-            app.Map("/ids", ids =>
-            {
-                IdSvrConfig.Configure(ids);
             });
         }
     }

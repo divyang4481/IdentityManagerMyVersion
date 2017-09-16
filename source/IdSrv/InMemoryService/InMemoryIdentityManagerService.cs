@@ -17,11 +17,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
+using IdentityManager;
 using IdentityManager.Extensions;
 
-namespace IdentityManager.Host.InMemoryService
+namespace IdSrv.InMemoryService
 {
     class InMemoryIdentityManagerService : IIdentityManagerService
     {

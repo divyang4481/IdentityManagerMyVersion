@@ -143,6 +143,7 @@
     <Compile Include="Assets\EmbeddedHtmlResult.cs" />
     <Compile Include="Configuration\AppBuilderExtensions.cs" />
     <Compile Include="Configuration\AutofacConfig.cs" />
+    <Compile Include="Configuration\EmptySecurityConfiguration.cs" />
     <Compile Include="Configuration\Hosting\AsyncHelper.cs" />
     <Compile Include="Configuration\Hosting\AutofacContainerMiddleware.cs" />
     <Compile Include="Configuration\Hosting\AutofacDependencyResolver.cs" />
@@ -160,6 +161,7 @@
     <Compile Include="Configuration\IdentityManagerOptions.cs" />
     <Compile Include="Configuration\ExternalBearerTokenConfiguration.cs" />
     <Compile Include="Configuration\Hosting\OAuthServerExtensions.cs" />
+    <Compile Include="Configuration\OAuthSettings.cs" />
     <Compile Include="Configuration\Registration.cs" />
     <Compile Include="Configuration\SecurityConfiguration.cs" />
     <Compile Include="Configuration\WebApiConfig.cs" />

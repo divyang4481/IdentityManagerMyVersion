@@ -45,6 +45,20 @@ namespace IdentityManager.Assets
 
         public HttpResponseMessage GetResponseMessage()
         {
+            OAuthSettings OAuthSettings = null;
+            if (this.securityConfiguration.OAuthSettings == null)
+            {
+                OAuthSettings = new OAuthSettings
+                {
+                    authorization_endpoint = this.authorization_endpoint,
+                    client_id = Constants.IdMgrClientId
+                };
+            }
+            else
+            {
+                OAuthSettings = this.securityConfiguration.OAuthSettings;
+            }
+
             var html = AssetManager.LoadResourceString(this.file,
                 new {
                     pathBase = this.path,
@@ -52,11 +66,7 @@ namespace IdentityManager.Assets
                     {
                         PathBase = this.path,
                         ShowLoginButton = this.securityConfiguration.ShowLoginButton,
-                        oauthSettings = new
-                        {
-                            authorization_endpoint = this.authorization_endpoint,
-                            client_id = Constants.IdMgrClientId
-                        }
+                        oauthSettings = OAuthSettings
                     })
                 });
 
